@@ -43,6 +43,7 @@ class Main(QMainWindow):
         self.db.setDatabaseName('Military_equipment_RF.sqlite')
         # И откроем подключение
         self.db.open()
+        self.aviationButton.setStyleSheet('font-color: {}'.format('#000000'))
 
     def hide(self):
         self.aviationButton.hide()
