@@ -36,6 +36,7 @@ class Main(QMainWindow):
         self.first_tabel = QTableView(self)
         self.first_tabel.move(750, 0)
         self.first_tabel.resize(750, 750)
+        self.first_tabel.setStyleSheet('background-color: {}'.format('#fff'))
         self.first_tabel.hide()
         # Зададим тип базы данных
         self.db = QSqlDatabase.addDatabase('QSQLITE')
@@ -43,7 +44,6 @@ class Main(QMainWindow):
         self.db.setDatabaseName('Military_equipment_RF.sqlite')
         # И откроем подключение
         self.db.open()
-        self.aviationButton.setStyleSheet('font-color: {}'.format('#000000'))
 
     def hide(self):
         self.aviationButton.hide()
@@ -61,6 +61,7 @@ class Main(QMainWindow):
 
     def new_page(self):
         self.first_tabel.show()
+        self.setStyleSheet('background-color: {}'.format('#fff'))
 
 
 if __name__ == '__main__':
