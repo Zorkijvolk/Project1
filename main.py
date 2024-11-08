@@ -1,6 +1,6 @@
 import sqlite3
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableView
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableView, QComboBox
 from PyQt6.QtSql import QSqlDatabase, QSqlTableModel
 
 
@@ -12,7 +12,7 @@ class Main(QMainWindow):
 
     def initUI(self):
         self.setGeometry(0, 0, 1500, 750)
-        self.setWindowTitle('Военная Техника РФ')
+        self.setWindowTitle('Справочник Военного РФ')
         self.setStyleSheet('background-color: {}'.format('#4f4646'))
         self.aviationButton = QPushButton('Авиация', self)
         self.fleetButton = QPushButton('Флот', self)
@@ -38,6 +38,18 @@ class Main(QMainWindow):
         self.first_tabel.resize(750, 750)
         self.first_tabel.setStyleSheet('background-color: {}'.format('#fff'))
         self.first_tabel.hide()
+        self.queryButton = QPushButton('поиск', self)
+        self.queryButton.hide()
+        self.parameterSelection = QComboBox(self)
+        self.parameterSelection.hide()
+        self.parameterSelection.insertItem(0, 'истребитель')
+        self.parameterSelection.insertItem(1, 'многоцелевой')
+        self.parameterSelection.insertItem(2, 'перевозчик')
+        self.parameterSelection.insertItem(3, 'учебно-боевой')
+        self.parameterSelection.insertItem(4, 'бомбардировщик')
+        self.parameterSelection.insertItem(5, 'атакующие')
+        self.parameterSelection.insertItem(6, 'разведывательные')
+        self.parameterSelection.resize(200, 30)
         # Зададим тип базы данных
         self.db = QSqlDatabase.addDatabase('QSQLITE')
         # Укажем имя базы данных
@@ -56,11 +68,13 @@ class Main(QMainWindow):
         self.new_page()
         model = QSqlTableModel(self, self.db)
         model.setTable('aviation')
+        model.removeColumn(3)
         model.select()
         self.first_tabel.setModel(model)
 
     def new_page(self):
         self.first_tabel.show()
+        self.parameterSelection.show()
         self.setStyleSheet('background-color: {}'.format('#fff'))
 
 
