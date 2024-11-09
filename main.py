@@ -27,8 +27,8 @@ class Main(QMainWindow):
         self.armyButton.move(500, 550)
         self.armyButton.resize(500, 100)
         self.aviationButton.clicked.connect(self.aviation)
-        self.fleetButton.clicked.connect(self.hide)
-        self.armyButton.clicked.connect(self.hide)
+        self.fleetButton.clicked.connect(self.fleet)
+        self.armyButton.clicked.connect(self.army)
         self.nameProject = QLabel('Военная Техника РФ', self)
         self.nameProject.resize(1500, 100)
         self.nameProject.move(300, 20)
@@ -42,13 +42,6 @@ class Main(QMainWindow):
         self.queryButton.hide()
         self.parameterSelection = QComboBox(self)
         self.parameterSelection.hide()
-        self.parameterSelection.insertItem(0, 'истребитель')
-        self.parameterSelection.insertItem(1, 'многоцелевой')
-        self.parameterSelection.insertItem(2, 'перевозчик')
-        self.parameterSelection.insertItem(3, 'учебно-боевой')
-        self.parameterSelection.insertItem(4, 'бомбардировщик')
-        self.parameterSelection.insertItem(5, 'атакующие')
-        self.parameterSelection.insertItem(6, 'разведывательные')
         self.parameterSelection.resize(200, 30)
         # Зададим тип базы данных
         self.db = QSqlDatabase.addDatabase('QSQLITE')
@@ -71,12 +64,36 @@ class Main(QMainWindow):
         model.removeColumn(3)
         model.select()
         self.first_tabel.setModel(model)
+        self.parameterSelection.insertItem(0, 'истребитель')
+        self.parameterSelection.insertItem(1, 'многоцелевой')
+        self.parameterSelection.insertItem(2, 'перевозчик')
+        self.parameterSelection.insertItem(3, 'учебно-боевой')
+        self.parameterSelection.insertItem(4, 'бомбардировщик')
+        self.parameterSelection.insertItem(5, 'атакующие')
+        self.parameterSelection.insertItem(6, 'разведывательные')
 
     def new_page(self):
         self.first_tabel.show()
         self.parameterSelection.show()
         self.setStyleSheet('background-color: {}'.format('#fff'))
 
+    def fleet(self):
+        self.hide()
+        self.new_page()
+        model = QSqlTableModel(self, self.db)
+        model.setTable('fleet')
+        model.removeColumn(3)
+        model.select()
+        self.first_tabel.setModel(model)
+
+    def army(self):
+        self.hide()
+        self.new_page(self)
+        model = QSqlTableModel(self, self.db)
+        model.setTable('aviation')
+        model.removeColumn(3)
+        model.select()
+        self.first_tabel.setModel(army)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
