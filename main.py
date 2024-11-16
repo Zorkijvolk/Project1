@@ -141,7 +141,6 @@ class Widget(QWizardPage):
         self.text = QTextBrowser(self)
         self.text.move(0, 0)
         self.text.resize(325, 350)
-        self.text.setText('''Негры работают в полях////////////////////////////////////////////////////////////''')
 
 
 if __name__ == '__main__':
