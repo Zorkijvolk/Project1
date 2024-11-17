@@ -1,7 +1,9 @@
 import sqlite3
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableView, QComboBox, QWizard, QTextEdit
-from PyQt6.QtWidgets import QTextBrowser, QWizardPage
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableView, QComboBox, QWizard, QLineEdit
+from PyQt6.QtWidgets import QTextBrowser, QWizardPage, QAbstractItemView
+from PyQt6.QtGui import QFont
+from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlDatabase, QSqlTableModel
 
 
@@ -12,9 +14,11 @@ class Main(QMainWindow):
         self.data_base = sqlite3.connect('Military_equipment_RF.sqlite')
 
     def initUI(self):
+        font = QFont()
+        font.setFamily("Comic Sans MS")
         self.setGeometry(0, 0, 1500, 750)
         self.setWindowTitle('Справочник Военного РФ')
-        self.setStyleSheet('background-color: {}'.format('#4f4646'))
+        self.setStyleSheet('background-color: {}'.format('#e8e6e6'))
         self.aviationButton = QPushButton('Авиация', self)
         self.fleetButton = QPushButton('Флот', self)
         self.aviationButton.resize(500, 100)
@@ -30,21 +34,29 @@ class Main(QMainWindow):
         self.aviationButton.clicked.connect(self.aviation)
         self.fleetButton.clicked.connect(self.fleet)
         self.armyButton.clicked.connect(self.army)
+        self.armyButton.setFont(font)
+        self.fleetButton.setFont(font)
+        self.aviationButton.setFont(font)
         self.nameProject = QLabel('Военная Техника РФ', self)
         self.nameProject.resize(1500, 100)
         self.nameProject.move(300, 20)
         self.nameProject.setStyleSheet('font-size: {}'.format('80pt'))
+        self.nameProject.setFont(font)
         self.first_tabel = QTableView(self)
-        self.first_tabel.move(750, 0)
-        self.first_tabel.resize(750, 750)
+        self.first_tabel.move(1150, 0)
+        self.first_tabel.resize(350, 750)
         self.first_tabel.setStyleSheet('background-color: {}'.format('#fff'))
         self.first_tabel.hide()
+        self.first_tabel.setFont(font)
+        self.first_tabel.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.queryButton = QPushButton('поиск', self)
         self.queryButton.hide()
         self.parameterSelection = QComboBox(self)
         self.parameterSelection.hide()
-        self.parameterSelection.resize(200, 30)
+        self.parameterSelection.resize(285, 60)
         self.parameterSelection.activated.connect(self.filter_aviation)
+        self.parameterSelection.setFont(font)
+        self.parameterSelection.setStyleSheet('font-size: {}'.format('20pt'))
         # Зададим тип базы данных
         self.db = QSqlDatabase.addDatabase('QSQLITE')
         # Укажем имя базы данных
@@ -55,7 +67,21 @@ class Main(QMainWindow):
         t = Widget()
         self.widget.addPage(t)
         self.widget.resize(750, 500)
-        self.widget.show()
+#        self.widget.show()
+        self.search = QLineEdit(self)
+        self.search.setFont(font)
+        self.search.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.search.hide()
+        self.search.resize(580, 60)
+        self.search.move(300, 0)
+        self.search.setStyleSheet('font-size: {}'.format('20pt'))
+        self.searchButton = QPushButton('Поиск', self)
+        self.searchButton.resize(250, 60)
+        self.searchButton.move(890, 0)
+        self.searchButton.setStyleSheet('font-size: {}'.format('20pt'))
+        self.searchButton.setFont(font)
+        self.searchButton.hide()
+
 
     def hide(self):
         self.aviationButton.hide()
@@ -65,6 +91,7 @@ class Main(QMainWindow):
 
     def aviation(self):
         self.new_page()
+        self.search.setText('Введите id техники')
         self.model = QSqlTableModel(self, self.db)
         self.model.setTable('aviation')
         self.model.removeColumn(3)
@@ -109,11 +136,15 @@ class Main(QMainWindow):
             self.model.setFilter(f"type = '{ids}'")
             self.model.select()
 
+    def search_aviation(self):
+        pass
+
     def new_page(self):
         self.first_tabel.show()
         self.hide()
         self.parameterSelection.show()
-        self.setStyleSheet('background-color: {}'.format('#fff'))
+        self.setStyleSheet('background-color: {}'.format('#e8e6e6'))
+        self.search.show()
 
     def fleet(self):
         self.new_page()
