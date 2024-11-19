@@ -167,6 +167,14 @@ class Main(QMainWindow):
         self.dButton.hide()
         if file.read() == '0':
             self.dButton.show()
+        
+        # для фторой формы
+
+        self.infoButton = QPushButton('информация о приложении', self)
+        self.infoButton.resize(500, 50)
+        self.infoButton.move(500, 680)
+        self.infoButton.clicked.connect(self.showWidget)
+        self.ww = InfoWidget()
 
         # для фторой формы
 
