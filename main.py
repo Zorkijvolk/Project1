@@ -167,7 +167,7 @@ class Main(QMainWindow):
         self.dButton.hide()
         if file.read() == '0':
             self.dButton.show()
-        
+
         # для фторой формы
 
         self.infoButton = QPushButton('информация о приложении', self)
@@ -249,6 +249,7 @@ class Main(QMainWindow):
         self.titleEnter.hide()
         self.yearEnter.hide()
         self.infoEnter.hide()
+        self.infoButton.hide()
 
     def showWidget(self):
         self.ww.show()
@@ -444,6 +445,7 @@ class Main(QMainWindow):
         self.infoEnter.show()
         self.addButton.show()
         self.firstButton.show()
+        self.infoButton.show()
 
 
 # создание страниы диалога с информацией и изображением
