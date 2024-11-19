@@ -1,7 +1,8 @@
 import sqlite3
 import sys
 import os
-import winshell
+from pathlib import Path
+from winshell import desktop
 from win32com.client import Dispatch
 from PIL import Image
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableView, QComboBox, QWizard, QLineEdit
@@ -11,19 +12,32 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlDatabase, QSqlTableModel
 
 
+# основной класс програмы
+
 class Main(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
         self.data_base = sqlite3.connect('Military_equipment_RF.sqlite')
 
+    # создание UI основного окна
+
     def initUI(self):
         font = QFont()
         font.setFamily("Comic Sans MS")
+
+        # создание первой страницы
+
         self.setGeometry(0, 0, 1500, 750)
         self.setFixedSize(1500, 750)
-        self.setWindowTitle('Справочник Военного РФ')
+        self.setWindowTitle('Справочник Лётчика РФ')
         self.setStyleSheet('background-color: {}'.format('#e8e6e6'))
+        self.firstButton = QPushButton('на главную', self)
+        self.firstButton.setFont(font)
+        self.firstButton.setStyleSheet('font-size: {}'.format('20pt'))
+        self.firstButton.resize(285, 50)
+        self.firstButton.hide()
+        self.firstButton.clicked.connect(self.first_page)
         self.aviationButton = QPushButton('Авиация', self)
         self.fleetButton = QPushButton(self)
         self.fleetButton.resize(500, 100)
@@ -42,11 +56,15 @@ class Main(QMainWindow):
         self.armyButton.setFont(font)
         self.fleetButton.setFont(font)
         self.aviationButton.setFont(font)
-        self.nameProject = QLabel('Военная Техника РФ', self)
+        self.nameProject = QLabel('Справочник Лётчика РФ', self)
         self.nameProject.resize(1500, 100)
-        self.nameProject.move(300, 20)
+        self.nameProject.move(0, 20)
         self.nameProject.setStyleSheet('font-size: {}'.format('80pt'))
         self.nameProject.setFont(font)
+        self.nameProject.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # создание второй страницы
+
         self.first_tabel = QTableView(self)
         self.first_tabel.move(1150, 0)
         self.first_tabel.resize(350, 750)
@@ -73,7 +91,7 @@ class Main(QMainWindow):
         self.widget = QWizard(self)
         self.page = Widget()
         self.widget.addPage(self.page)
-        self.widget.resize(750, 520)
+        self.widget.resize(1500, 520)
         self.search = QLineEdit(self)
         self.search.setFont(font)
         self.search.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -89,11 +107,11 @@ class Main(QMainWindow):
         self.searchButton.hide()
         self.searchLabel = QLabel('Поиск информации', self)
         self.searchLabel.setStyleSheet('font-size: {}'.format('40pt'))
-        self.searchLabel.resize(1150, 60)
+        self.searchLabel.resize(800, 60)
+        self.searchLabel.move(330, 0)
         self.addLabel = QLabel('Добавление в таблицу', self)
         self.addLabel.setStyleSheet('font-size: {}'.format('40pt'))
         self.addLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.searchLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.addLabel.setFont(font)
         self.searchLabel.setFont(font)
         self.addLabel.resize(1150, 60)
@@ -136,7 +154,10 @@ class Main(QMainWindow):
         self.addButton.setStyleSheet('font-size: {}'.format('20pt'))
         self.search.setPlaceholderText('Введите id техники')
         self.error = QMessageBox(self)
-        self.widget.setFixedSize(750, 520)
+        self.widget.setFixedSize(1500, 750)
+
+        # для первого запуская программы
+
         file = open('FirstEnter.txt', mode='r', encoding='UTF-8')
         self.dButton = QPushButton('добавить ярлык на рабочий стол', self)
         self.dButton.resize(200, 200)
@@ -146,6 +167,7 @@ class Main(QMainWindow):
         if file.read() == '0':
             self.dButton.show()
 
+    # Функция для первого запуская программы
 
     def first_enter_f(self):
         self.firstEnter = QWizard()
@@ -154,7 +176,19 @@ class Main(QMainWindow):
         page2.noButton.clicked.connect(self.hides)
         self.firstEnter.addPage(page2)
         self.firstEnter.resize(750, 520)
+        self.firstEnter.setFixedSize(750, 520)
         self.firstEnter.show()
+
+    # Функция, перенаправляющая на начальную страницу
+
+    def first_page(self):
+        self.hide_f()
+        self.aviationButton.show()
+        self.fleetButton.show()
+        self.armyButton.show()
+        self.nameProject.show()
+
+    # Функция для кнопки noButton
 
     def hides(self):
         file = open('FirstEnter.txt', mode='w', encoding='UTF-8')
@@ -164,27 +198,42 @@ class Main(QMainWindow):
         self.firstEnter.hide()
         self.dButton.hide()
 
+    # Функция, создающаяя ярлык на рабочем столе
+
     def desktop(self):
-        desktop = winshell.desktop()
-        t = os.path.abspath('__Main__')[:7]
-        path = os.path.join(desktop, "PilotsHandbook.lnk")
+        t = os.path.abspath('__Main__')[:-8]
         target = rf"{t}PilotsHandbook.exe"
-        wdir = rf'{t}'
-        icon = rf"{t}MainImage.png"
         shell = Dispatch('WScript.Shell')
-        shortcut = shell.CreateShortCut(path)
+        shortcut = shell.CreateShortCut(str(Path(desktop()) / "PilotsHandbook.lnk"))
         shortcut.Targetpath = target
-        shortcut.WorkingDirectory = wdir
-        shortcut.IconLocation = icon
+        shortcut.WorkingDirectory = str(Path(target).parent)
+        shortcut.IconLocation = target
         shortcut.save()
         self.hides()
 
+    # Функция для скрытия объектов
 
-    def hide(self):
+    def hide_f(self):
+        self.dButton.hide()
         self.aviationButton.hide()
         self.fleetButton.hide()
         self.armyButton.hide()
         self.nameProject.hide()
+        self.first_tabel.hide()
+        self.parameterSelection.hide()
+        self.queryButton.hide()
+        self.firstButton.hide()
+        self.typeSelection.hide()
+        self.search.hide()
+        self.searchLabel.hide()
+        self.searchButton.hide()
+        self.addLabel.hide()
+        self.addButton.hide()
+        self.titleEnter.hide()
+        self.yearEnter.hide()
+        self.infoEnter.hide()
+
+    # функия для корректирования базы данных
 
     def change_aviation(self):
         db = sqlite3.connect("Military_equipment_RF.sqlite")
@@ -255,26 +304,34 @@ class Main(QMainWindow):
                             self.error.setText('Введите краткую информацию')
                             self.error.show()
                         else:
-                            fname = QFileDialog.getOpenFileName(
-                                self, 'Выбрать картинку', '',
-                                'Картинка (*.png);;Все файлы (*)')[0]
-                            image = Image.open(fname)
-                            ids1 = cur.execute("""SELECT id from aviation""").fetchall()
-                            ids = int([x[0] for x in ids1][-1]) + 1
-                            year = self.yearEnter.text()
-                            title = self.titleEnter.text()
-                            image.save(f'images/{title}.png')
-                            db.execute(
-                                f"""INSERT INTO aviation(title, year, type) VALUES('{title}', '{year}', '{types}')""")
-                            db.commit()
-                            self.filter_aviation()
-                            text = open(f'texts/{title}.txt', mode='w', encoding='UTF-8')
-                            text.write(self.infoEnter.toPlainText())
-                            text.close()
+                            try:
+                                fname = QFileDialog.getOpenFileName(
+                                    self, 'Выбрать картинку', '',
+                                    'Картинка (*.png);;Все файлы (*)')[0]
+                                image = Image.open(fname)
+                                t = cur.execute("""SELECT title from aviation""").fetchall()
+                                t = [x[0] for x in t][-1]
+                                ids = int(cur.execute(f"""SELECT id from aviation
+                                where title == '{t}'""").fetchone()[0]) + 1
+                                year = self.yearEnter.text()
+                                title = self.titleEnter.text()
+                                image.save(f'images/{title}.png')
+                                db.execute(
+                                    f"""INSERT INTO aviation(title, year, type) VALUES('{title}', '{year}', '{types}')""")
+                                db.commit()
+                                self.filter_aviation()
+                                text = open(f'texts/{title}.txt', mode='w', encoding='UTF-8')
+                                text.write(self.infoEnter.toPlainText())
+                                text.close()
+                            except Exception:
+                                self.error.setText('Ошибка, попробуйте снова')
+                                self.error.show()
 
         else:
             self.error.setText('Введите название техники')
             self.error.show()
+
+    # Функция для кнопки aviationButton
 
     def aviation(self):
         self.new_page()
@@ -300,6 +357,8 @@ class Main(QMainWindow):
         self.typeSelection.insertItem(4, 'атакующие')
         self.typeSelection.insertItem(5, 'разведывательные')
         self.typeSelection.insertItem(6, 'истребитель')
+
+    # функция, осуществляющая фильтрацию таблицы по указанному типу авиации
 
     def filter_aviation(self):
         cur = sqlite3.connect("Military_equipment_RF.sqlite").cursor()
@@ -331,6 +390,8 @@ class Main(QMainWindow):
             self.model.setFilter(f"type = '{ids}'")
             self.model.select()
 
+    # Функция осуществляющая поиск и вывод информации по id
+
     def search_aviation(self):
         if self.search.text().isdigit():
             cur = sqlite3.connect("Military_equipment_RF.sqlite").cursor()
@@ -347,9 +408,11 @@ class Main(QMainWindow):
             self.error.setText('некорректный ввод')
             self.error.show()
 
+    # Функция перехода на новую страницу
+
     def new_page(self):
+        self.hide_f()
         self.first_tabel.show()
-        self.hide()
         self.parameterSelection.show()
         self.setStyleSheet('background-color: {}'.format('#e8e6e6'))
         self.search.show()
@@ -361,6 +424,10 @@ class Main(QMainWindow):
         self.yearEnter.show()
         self.infoEnter.show()
         self.addButton.show()
+        self.firstButton.show()
+
+
+# создание страниы диалога с информацией и изображением
 
 
 class Widget(QWizardPage):
@@ -369,14 +436,15 @@ class Widget(QWizardPage):
         self.InitUI()
 
     def InitUI(self):
+        1500, 750
         self.text = QTextBrowser(self)
-        self.text.move(0, 30)
-        self.text.resize(325, 350)
+        self.text.move(0, 130)
+        self.text.resize(325, 750)
         self.image = QLabel(self)
-        self.image.resize(325, 350)
+        self.image.resize(1150, 750)
         self.image.move(325, 30)
         self.label = QLabel(self)
-        self.label.resize(650, 30)
+        self.label.resize(1500, 30)
         self.label.move(0, 0)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setStyleSheet('font-size: {}'.format('20pt'))
@@ -387,10 +455,15 @@ class Widget(QWizardPage):
         self.label.setText(name)
 
 
+# создание страниы диалога
+
+
 class FirstEnter(QWizardPage):
     def __init__(self):
         super().__init__()
         self.InitUI()
+
+    # создания UI страницы диалога
 
     def InitUI(self):
         self.label = QLabel('Приветствуем вас в нашем приложении!', self)
@@ -419,6 +492,9 @@ class FirstEnter(QWizardPage):
         background-color: green""")
         self.noButton.setStyleSheet("""font-size: 20pt;
         background-color: red""")
+
+
+# запуск программы
 
 
 if __name__ == '__main__':
