@@ -7,6 +7,7 @@ from win32com.client import Dispatch
 from PIL import Image
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QTableView, QComboBox, QWizard, QLineEdit
 from PyQt6.QtWidgets import QTextBrowser, QWizardPage, QAbstractItemView, QPlainTextEdit, QMessageBox, QFileDialog
+from PyQt6.QtWidgets import QWidget
 from PyQt6.QtGui import QFont, QPixmap
 from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlDatabase, QSqlTableModel
