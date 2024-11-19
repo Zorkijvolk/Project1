@@ -166,6 +166,14 @@ class Main(QMainWindow):
         self.dButton.hide()
         if file.read() == '0':
             self.dButton.show()
+        
+        # для фторой формы
+
+        self.infoButton = QPushButton('информация о приложении', self)
+        self.infoButton.resize(500, 50)
+        self.infoButton.move(500, 680)
+        self.infoButton.clicked.connect(self.showWidget)
+        self.ww = InfoWidget()
 
     # Функция для первого запуская программы
 
@@ -232,6 +240,9 @@ class Main(QMainWindow):
         self.titleEnter.hide()
         self.yearEnter.hide()
         self.infoEnter.hide()
+
+    def showWidget(self):
+        self.ww.show()
 
     # функия для корректирования базы данных
 
@@ -326,7 +337,6 @@ class Main(QMainWindow):
                             except Exception:
                                 self.error.setText('Ошибка, попробуйте снова')
                                 self.error.show()
-
         else:
             self.error.setText('Введите название техники')
             self.error.show()
@@ -436,7 +446,6 @@ class Widget(QWizardPage):
         self.InitUI()
 
     def InitUI(self):
-        1500, 750
         self.text = QTextBrowser(self)
         self.text.move(0, 130)
         self.text.resize(325, 750)
@@ -492,6 +501,27 @@ class FirstEnter(QWizardPage):
         background-color: green""")
         self.noButton.setStyleSheet("""font-size: 20pt;
         background-color: red""")
+
+
+class InfoWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.InitUI()
+
+    def InitUI(self):
+        self.setWindowTitle('Информация о программе')
+        self.setGeometry(0, 0, 500, 500)
+        self.label = QLabel('Информация о программе', self)
+        self.label.resize(500, 100)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label.setStyleSheet('font-size: {}'.format('20pt'))
+        self.text = QTextBrowser(self)
+        self.text.resize(500, 400)
+        self.text.move(0, 100)
+        file = open('README.md', mode='r', encoding='UTF-8')
+        self.text.setText(file.read())
+        self.text.setStyleSheet('font-size: {}'.format('20pt'))
+        self.setFixedSize(500, 500)
 
 
 # запуск программы
